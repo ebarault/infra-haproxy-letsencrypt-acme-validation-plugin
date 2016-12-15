@@ -60,7 +60,7 @@ This will pass ACME http-01 validation requests to the Lua plugin handler.
 
 *Note:* ACME protocol stipulates validation on port 80. If your HTTP frontend listens on a non-standard port, make sure to add a port 80 bind directive.
 
-Finally, soft-restart HAProxy (see below for instructions) to apply the updated configuration.
+Finally, soft-restart HAProxy with `service haproxy reload` to apply the updated configuration.
 
 ## Workflow
 
@@ -81,9 +81,20 @@ frontend https
 ...
 ```
 
+or, if using a single certifcate base with SNI:
+
+```
+...
+frontend https
+    bind *:443 ssl strict-sni crt /etc/ssl/private
+...
+```
+
+
 ### 2. Install `letsencrypt` client
 
 Follow the [official guide](https://letsencrypt.readthedocs.org/en/latest/using.html#getting-the-code) to install the client.
+Copy client and renewal automation script to `/user/local/bin` 
 
 ### 3. Issue certificate
 
@@ -92,7 +103,7 @@ We are ready to create our certificate. Let's roll!
 We invoke the `letsencrypt` client with the [webroot method](https://letsencrypt.readthedocs.org/en/latest/using.html#webroot).
 `--webroot-path` must be set to the value of the `chroot` parameter in your `haproxy.cfg`. If you are not running HAProxy chrooted you need to set it to the value of the `non_chroot_webroot` parameter configured in the Lua plugin.
 
-	$ sudo ./letsencrypt-auto certonly --text --webroot --webroot-path \
+	$ sudo ./cert-auto certonly --text --webroot --webroot-path \
 	  /var/lib/haproxy -d www.example.com --renew-by-default --agree-tos \
 	  --email your@email.com
 
@@ -143,5 +154,5 @@ Use it in a cron job like this for weekly runs:
 
 	$ sudo crontab -e
 
-	5 8 * * 6 /usr/bin/cert-renewal-haproxy.sh
+	0 2 * * * /usr/local/bin/cert-renewal-haproxy.sh
 
