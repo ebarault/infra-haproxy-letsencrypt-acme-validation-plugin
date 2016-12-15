@@ -165,6 +165,7 @@ Create a simple script to automate the regular certificate pull
     # script content
     cd /etc/ssl/private
     git pull
+    service haproxy restart
 
 Use it in a cron job like this for daily runs:
 
