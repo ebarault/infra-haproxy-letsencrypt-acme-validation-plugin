@@ -12,16 +12,18 @@
 ## configuration ##
 ###################
 
-EMAIL="your_le_account@email.com"
+EMAIL="eric.barault@carbip.com"
 
-LE_CLIENT="/path/to/letsencrypt-auto"
+LE_CLIENT="/usr/local/bin/certbot-auto"
 
 HAPROXY_RELOAD_CMD="service haproxy reload"
 
 WEBROOT="/var/lib/haproxy"
 
+HACRTBASE="/etc/ssl/private" 
+
 # Enable to redirect output to logfile (for silent cron jobs)
-# LOGFILE="/var/log/certrenewal.log"
+LOGFILE="/var/log/certrenewal.log"
 
 ######################
 ## utility function ##
@@ -35,7 +37,7 @@ function issueCert {
 function logger_error {
   if [ -n "${LOGFILE}" ]
   then
-    echo "[error] [$(date +'%d.%m.%y - %H:%M')] ${1}" >> ${LOGFILE}
+    echo "[error] ${1}" >> ${LOGFILE}
   fi
   >&2 echo "[error] ${1}"
 }
@@ -43,7 +45,7 @@ function logger_error {
 function logger_info {
   if [ -n "${LOGFILE}" ]
   then
-    echo "[info] [$(date +'%d.%m.%y - %H:%M')] ${1}" >> ${LOGFILE}
+    echo "[info] ${1}" >> ${LOGFILE}
   else
     echo "[info] ${1}"
   fi
@@ -54,6 +56,9 @@ function logger_info {
 ##################
 
 le_cert_root="/etc/letsencrypt/live"
+
+NOW=$(date +"%D %T")
+logger_info "certificate renewal script launched: $NOW"
 
 if [ ! -d ${le_cert_root} ]; then
   logger_error "${le_cert_root} does not exist!"
@@ -88,13 +93,14 @@ while IFS= read -r -d '' cert; do
   fi
 done < <(find /etc/letsencrypt/live -name cert.pem -print0)
 
-# create haproxy.pem file(s)
+# create *.pem file(s) for haproxy and move them to haproxy crt base
 for domain in ${renewed_certs[@]}; do
-  cat ${le_cert_root}/${domain}/privkey.pem ${le_cert_root}/${domain}/fullchain.pem | tee ${le_cert_root}/${domain}/haproxy.pem >/dev/null
+  cat ${le_cert_root}/${domain}/privkey.pem ${le_cert_root}/${domain}/fullchain.pem | sudo tee ${HACRTBASE}/${domain}.pem >/dev/null
   if [ $? -ne 0 ]; then
     logger_error "failed to create haproxy.pem file!"
     exit 1
   fi
+	
 done
 
 # soft-restart haproxy
@@ -107,3 +113,4 @@ if [ "${#renewed_certs[@]}" -gt 0 ]; then
 fi
 
 exit ${exitcode}
+
