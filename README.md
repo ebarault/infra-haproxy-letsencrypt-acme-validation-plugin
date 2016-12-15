@@ -150,9 +150,22 @@ The script automates the following steps:
 - Create the haproxy.pem files
 - Soft-restart HAProxy.
 
-Use it in a cron job like this for weekly runs:
+Use it in a cron job like this for daily runs:
 
 	$ sudo crontab -e
-
 	0 2 * * * /usr/local/bin/cert-renewal-haproxy.sh
 
+### automatic sync of certificates on any other servers
+    
+Add the ssh key of a read-only gitlab user authorized on ssl-certificates repo 
+    
+Create a simple script to automate the regular certificate pull
+
+    $ vim sync-ssl-certs.sh
+    cd /etc/ssl/private
+    git pull
+
+Use it in a cron job like this for daily runs:
+
+	$ sudo crontab -e
+	0 3 * * * /usr/local/bin/sync-ssl-certs.sh
