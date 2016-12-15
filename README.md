@@ -104,14 +104,14 @@ We invoke the `letsencrypt` client with the [webroot method](https://letsencrypt
 `--webroot-path` must be set to the value of the `chroot` parameter in your `haproxy.cfg`. If you are not running HAProxy chrooted you need to set it to the value of the `non_chroot_webroot` parameter configured in the Lua plugin.
 
 	$ sudo ./cert-auto certonly --text --webroot --webroot-path \
-	  /var/lib/haproxy -d www.example.com --renew-by-default --agree-tos \
-	  --email your@email.com
+	  /var/lib/haproxy -d newhost.carbipcloud1.com --renew-by-default --agree-tos \
+	  --email eric.barault@carbip.com
 
-Next, concat the certificate chain and private key to a `PEM` file suitable for HAProxy:
+Next, concat the certificate chain and private key to a `PEM` file suitable for HAProxy, and place it right in haproxy cert base
 
-	$ sudo cat /etc/letsencrypt/live/www.example.com/privkey.pem \
-	  /etc/letsencrypt/live/www.example.com/fullchain.pem \
-	  | sudo tee /etc/letsencrypt/live/www.example.com/haproxy.pem >/dev/null
+	$ sudo cat /etc/letsencrypt/live/newhost.carbipcloud1.com/privkey.pem \
+	  /etc/letsencrypt/live/newhost.carbipcloud1.com/fullchain.pem \
+	  | sudo tee /etc/ssl/private/newhost.carbipcloud1.com.pem >/dev/null
 
 Whohaaa! Done.
 
