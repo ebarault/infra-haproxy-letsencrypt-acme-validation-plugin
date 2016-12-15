@@ -162,6 +162,7 @@ Add the ssh key of a read-only gitlab user authorized on ssl-certificates repo
 Create a simple script to automate the regular certificate pull
 
     $ vim sync-ssl-certs.sh
+    # script content
     cd /etc/ssl/private
     git pull
 
