@@ -173,3 +173,9 @@ Use it in a cron job like this for daily runs:
 
 	$ sudo crontab -e
 	0 4 * * * PATH=$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin /usr/local/bin/cert-renewal-haproxy.sh
+	
+### troubleshooting
+
+If certbot-auto bootstrap fails, try installing manually the deps, for example (as root)
+    
+    apt-get install libssl-dev libssl1.0.0 openssl
