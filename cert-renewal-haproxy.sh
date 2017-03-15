@@ -30,7 +30,7 @@ LOGFILE="/var/log/certrenewal.log"
 ######################
 
 function issueCert {
-  $LE_CLIENT certonly --text --webroot --webroot-path ${WEBROOT} --renew-by-default --agree-tos --email ${EMAIL} $1 &>/dev/null
+  $LE_CLIENT certonly --non-interactive --text --webroot --webroot-path ${WEBROOT} --renew-by-default --agree-tos --email ${EMAIL} $1 &>/dev/null
   return $?
 }
 
